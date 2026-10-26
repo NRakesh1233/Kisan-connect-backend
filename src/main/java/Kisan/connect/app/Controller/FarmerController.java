@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import Kisan.connect.app.Requests.AddProductRequest;
 import Kisan.connect.app.Requests.AddProfileRequest;
 import Kisan.connect.app.Requests.Dashboard;
+import Kisan.connect.app.Response.EarningResponse;
 import Kisan.connect.app.Response.OrderResponse;
 import Kisan.connect.app.Response.ProductsResponse;
 import Kisan.connect.app.Response.ReviewResponse;
@@ -41,6 +42,7 @@ public class FarmerController {
 
 	@Autowired
 	private UserService userService;
+	
 	
 	
 	
@@ -70,7 +72,7 @@ public class FarmerController {
 
 
 	@GetMapping("/products")
-	public ResponseEntity<List<ProductsResponse>> getProducts(){
+	public ResponseEntity<List<ProductsResponse>> getFarmerProducts(){
 		
 		return  ResponseEntity.ok(productsService.getFarmerProducts());
 		
@@ -131,6 +133,13 @@ public class FarmerController {
 		
 		return userService.getUserDetalis();
 	}
+	
+	@GetMapping("/earnings/{pnum}")
+	public ResponseEntity<EarningResponse> getEarning( @PathVariable int pnum){
+		return  ResponseEntity.ok(farmerService.getEarning(pnum));
+	}
+	
+	
 	
 	
 }

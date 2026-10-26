@@ -1,6 +1,7 @@
 package Kisan.connect.app.Config;
 
 import java.util.Collection;
+
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -35,6 +36,4 @@ public class CustomUserDetails implements UserDetails {
 		// TODO Auto-generated method stub
 		return user.getEmail();
 	}
-
-	
 }

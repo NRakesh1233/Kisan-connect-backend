@@ -14,8 +14,14 @@ public class UserResponse {
 	private String name;
 	
 	private String email;
+private Double rating;
 
-
+	public Double getRating() {
+	return rating;
+}
+public void setRating(Double rating) {
+	this.rating = rating;
+}
 	public Integer getId() {
 		return Id;
 	}

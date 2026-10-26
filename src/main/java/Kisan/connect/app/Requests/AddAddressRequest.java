@@ -5,56 +5,37 @@ import org.springframework.beans.BeanUtils;
 import Kisan.connect.app.entities.Address;
 
 public class AddAddressRequest {
-
     private String fullName;
-
     private String mobileNumber;
-
     private String houseNo;
-
     private String street;
-
     private String village;
-
     private String mandal;
-
     private String district;
-
     private String state;
-
     private String pincode;
-
     private String landmark;
-
     private String addressType;
-
     public AddAddressRequest() {
     }
-
     public String getFullName() {
         return fullName;
     }
-
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-
     public String getMobileNumber() {
         return mobileNumber;
     }
-
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
-
     public String getHouseNo() {
         return houseNo;
     }
-
     public void setHouseNo(String houseNo) {
         this.houseNo = houseNo;
     }
-
     public String getStreet() {
         return street;
     }

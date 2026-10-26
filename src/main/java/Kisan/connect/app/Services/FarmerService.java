@@ -19,6 +19,7 @@ import Kisan.connect.app.Repository.ProductsRepository;
 import Kisan.connect.app.Repository.ReviewRepository;
 import Kisan.connect.app.Repository.UserRepo;
 import Kisan.connect.app.Requests.Dashboard;
+import Kisan.connect.app.Response.EarningResponse;
 import Kisan.connect.app.Response.OrderItemResponse;
 import Kisan.connect.app.Response.OrderResponse;
 import Kisan.connect.app.Response.ProductsResponse;
@@ -233,8 +234,7 @@ for (int j = 0; j < items.size(); j++) {
 				sum=sum+review;
 				count++;
 			}
-			
-			
+				
 		}
 		Double rating=sum/count;
 		das.setRating(rating);
@@ -378,6 +378,60 @@ for (int j = 0; j < items.size(); j++) {
 		
 		return response;
 	}
+	
+	public List<ReviewResponse> getReviewOfProduct(int pnum) {
+		// TODO Auto-generated method stub
+		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	        Users farmer = userRepo.findByEmail(authentication.getName())
+	                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+	        
+	       List<ReviewResponse> response= new ArrayList<>();
+		Products product =productsRepository.findById(pnum)
+				.orElseThrow(()->new ResourceNotFoundException("user not found"));
+		List<Review> reviews= reviewRepository.findByProduct(product);
+		
+		for (int i = 0; i < reviews.size(); i++) {
+			
+			Review rew =reviews.get(i);
+			ReviewResponse res= new ReviewResponse();
+			
+			res.setId(rew.getReviewId());
+			res.setCustomerDetails(rew.getCustomer());
+			res.setComment(rew.getReview());
+			res.setRating(rew.getRating());
+			res.setDate(rew.getReviewDate());
+			    
+			
+			response.add(res);
+			
+		}
+		
+		return response;
+	}
+
+
+	public EarningResponse getEarning(int pnum) {
+		// TODO Auto-generated method stub
+		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+		 Users farmer = userRepo.findByEmail(authentication.getName())
+	                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+		 
+		 ResponseEntity<ProductsResponse> product = productService.getProductById(pnum);
+		 EarningResponse  response=new  EarningResponse();
+		 response.setProduct(product.getBody());
+		 
+		 response.setReviews(getReviewOfProduct(pnum));
+		 
+		 List<Orders> ods=orderItemRepository.findByProductId(pnum);
+		 response.setOrdersCount(ods.size());
+		response.setRating(reviewRepository.findByProductRating(pnum));
+		
+		return response;
+	}
+	
+	
+
 
 	
 	

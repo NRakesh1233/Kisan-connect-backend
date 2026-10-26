@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -29,6 +31,7 @@ import Kisan.connect.app.Response.AddressResponse;
 import Kisan.connect.app.Response.CartResponse;
 import Kisan.connect.app.Response.OrderItemResponse;
 import Kisan.connect.app.Response.OrderResponse;
+import Kisan.connect.app.Response.ReviewResponse;
 import Kisan.connect.app.entities.Address;
 import Kisan.connect.app.entities.Cart;
 import Kisan.connect.app.entities.OrderItems;
@@ -192,8 +195,8 @@ public class CustomerService {
 					       p.getCategory(),
 					       p.getUnit(),
 					       p.getStock(),
-					      user.getId(),
-					      user.getName(),
+					     p.getFarmer().getId(),
+					      p.getFarmer().getName(),
 					     p.getFarmer().getProfilePic()
 					);
 			
@@ -226,6 +229,18 @@ public class CustomerService {
 		
 		cartRepository.deleteById(id);
 		return ResponseEntity.ok("cart item successfully deleted!!");
+	}
+	
+
+	public ResponseEntity<String> deleteCart() {
+		
+		  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	        Users customer = userRepo.findByEmail(authentication.getName())
+	                .orElseThrow(() -> new RuntimeException("Customer not found"));
+	        cartRepository.deleteByUser(customer);
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(" allcart items successfully deleted!!");
 	}
 
 	public ResponseEntity<List<AddressResponse>> getAllAddresses() {
@@ -468,5 +483,140 @@ OrderResponse orderResponse=new OrderResponse(
 		return ResponseEntity.ok(" thank your for review!!");
 		
 	}
+	public ResponseEntity<String> updateReview(ReviewRequest request) {
+		// TODO Auto-generated method stub
+	
+		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	        Users customer = userRepo.findByEmail(authentication.getName())
+	                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+	    	
+	      
+	        OrderItems item=orderItemRepository.findById(request.getOrderItemId())
+	        		 .orElseThrow(() -> new ResourceNotFoundException("order item not found"));
+	        Review review=reviewRepository.findByCustomerAndOrderItem(customer,item)
+	        		  .orElseThrow(() -> new ResourceNotFoundException("review not found"));
+	        review.setCustomer(customer);
+	        review.setProduct(item.getProduct());
+	        review.setOrderItem(item);
+	        review.setRating(request.getRating());
+	        review.setReviewDate(LocalDateTime.now());
+	        review.setReview(request.getReview());
+	        
+		reviewRepository.save(review);
+		return ResponseEntity.ok(" your review is updated!!");
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+
+	public ResponseEntity<OrderResponse> getOrderById(Integer id) {
+		
+		Orders o = orderRepository.findById(id).get();
+		// TODO Auto-generated method stub
+		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		 Users customer = userRepo.findByEmail(authentication.getName())
+	                .orElseThrow(() -> new RuntimeException("Customer not found"));
+	        
+    	Address a=addressRepository.findById(o.getDeliveryAddress().getAddressId()).get();
+		
+		String fullAddress ="HNo."+
+		        a.getHouseNo() + ", " +
+		        a.getStreet() + ", " +
+		        a.getVillage() + "(Village) " +
+		        a.getMandal() + "(mandal) " +
+		        a.getDistrict() + "(district) " +
+		        a.getState() + " - " +
+		        a.getPincode();
+		
+		
+		List<OrderItems> items=orderItemRepository.findByOrder(o);
+
+		List<OrderItemResponse> orderItemRespone=new ArrayList<>();
+		for (int j = 0; j < items.size(); j++) {
+			
+			OrderItems or=items.get(j);
+		//Order
+//			 public OrderItemResponse(int orderItemId, Integer productId, String productName, String image, Integer orderId,
+//					Double quantity, Double price, Double totalPrice) {
+		//	
+			
+			OrderItemResponse oir=new OrderItemResponse(
+					or.getOrderItemId(),
+					or.getProduct().getProductId(),
+					or.getProduct().getProductName(),
+					or.getProduct().getImage(),
+					or.getOrder().getOrderId(),
+					or.getQuantity(),
+					or.getPrice(),
+					or.getTotalPrice()
+				
+					);
+			
+			orderItemRespone.add(j, oir);
+			
+			
+		}
+
+		OrderResponse orderResponse=new OrderResponse(
+			        			o.getOrderId(),
+			        			o.getTotalAmount(),
+			        			o.getOrderStatus(),
+			        			o.getPaymentMethod(),
+			        			o.getPaymentStatus(),
+			        			o.getOrderDate(),
+			        			customer.getId(),
+			        			customer.getName(),
+			        			o.getFarmer().getId(),
+			        			o.getFarmer().getName(),
+			        			fullAddress,
+			        			
+			        			orderItemRespone
+			        			
+			        			);
+			        	
+		
+		
+		return  ResponseEntity.ok(orderResponse);
+	}
+	// Example logic in Spring Boot
+	public ResponseEntity<ReviewResponse> getReviewByCustomerAndItem( Integer orderItemId) {
+	    // Verify that this order item actually belongs to this customer, then fetch the review
+		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	        Users customer = userRepo.findByEmail(authentication.getName())
+	                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+	        OrderItems item= orderItemRepository.findById(orderItemId).get();
+	        
+	    Review review = reviewRepository.findByCustomerAndOrderItem(customer,item)
+	        .orElse(null);
+	        
+	    if (review == null) {
+	        return ResponseEntity.ok(null); // No review posted yet
+	    }
+	    
+	    // Map to ReviewResponse and return
+	    return ResponseEntity.ok(convertToResponse(review));
+	}
+
+	private ReviewResponse convertToResponse(Review rew) {
+		ReviewResponse res= new ReviewResponse();
+			
+			res.setId(rew.getReviewId());
+			res.setCustomerDetails(rew.getCustomer());
+			res.setComment(rew.getReview());
+			res.setRating(rew.getRating());
+			res.setDate(rew.getReviewDate());
+	return res;
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

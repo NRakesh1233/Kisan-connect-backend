@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,11 +26,14 @@ import Kisan.connect.app.Requests.ReviewRequest;
 import Kisan.connect.app.Response.AddressResponse;
 import Kisan.connect.app.Response.CartResponse;
 import Kisan.connect.app.Response.OrderResponse;
+import Kisan.connect.app.Response.ReviewResponse;
+import Kisan.connect.app.Response.UserResponse;
 import Kisan.connect.app.Services.CustomerService;
 import Kisan.connect.app.Services.FarmerService;
 import Kisan.connect.app.Services.UserService;
 import Kisan.connect.app.entities.OrderStatus;
 
+@CrossOrigin(origins = "http://localhost:5173")
 
 @RestController
 @RequestMapping("/customer")
@@ -49,6 +53,12 @@ public class CustomerController {
 		String response=userService.addProfilePic(request);
 		
 		return ResponseEntity.ok(response);
+		
+	}
+	@GetMapping("/profile")
+	public ResponseEntity<UserResponse> getUserDetails(){
+		
+		return userService.getUserDetalis();
 		
 	}
 
@@ -106,6 +116,11 @@ String response= customerService.addOrder(request);
 		return customerService.deleteCart(id);
 		
 	}
+	@DeleteMapping("/cart/delete/all")
+	public ResponseEntity<String> deleteAllCart(){
+		return customerService.deleteCart();
+		
+	}
 	
 	@GetMapping("/address/all")
 	public ResponseEntity<List<AddressResponse>> getAllAddresses(){
@@ -135,6 +150,14 @@ String response= customerService.addOrder(request);
 		return customerService.getOrders();
 		
 	}
+	
+	@GetMapping("/orders/{id}")
+	public ResponseEntity<OrderResponse> getOrderById(@PathVariable Integer id){
+		
+		
+		return customerService.getOrderById(id);
+		
+	}
 
 	@PutMapping("/order/status")
 	public ResponseEntity<String> orderStatus(@RequestParam int id,@RequestParam OrderStatus status){
@@ -155,6 +178,25 @@ String response= customerService.addOrder(request);
 		
 		
 		return customerService.addReview(request);
+		
+	}
+	@PutMapping("/order/product/review/update")
+	public ResponseEntity<String> updateReview(@RequestBody ReviewRequest request){
+		
+	
+		
+		
+		
+		return customerService.updateReview(request);
+		
+	}
+	
+	@GetMapping("/reviews/orderItem/{id}")
+	public ResponseEntity<ReviewResponse> fetchReviewsByOrderItemId(@PathVariable Integer id){
+		
+		
+		
+		return customerService.getReviewByCustomerAndItem(id);
 		
 	}
 	

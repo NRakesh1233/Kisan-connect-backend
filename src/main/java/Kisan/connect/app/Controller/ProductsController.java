@@ -45,7 +45,13 @@ public ResponseEntity<List<ProductsResponse>> getTopProducts(){
 		return  productsService.getTopProducts();
 		
 	}
+	@GetMapping("products/farmer/{id}")
 	
+public ResponseEntity<List<ProductsResponse>> getProductByFarmer(@PathVariable int id){
+		
+		return  productsService.getProductByFarmer(id);
+	
+	}
 	
 	
 	
@@ -56,5 +62,15 @@ public ResponseEntity<List<ProductsResponse>> getTopProducts(){
 //		
 //		return null;
 //	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
 

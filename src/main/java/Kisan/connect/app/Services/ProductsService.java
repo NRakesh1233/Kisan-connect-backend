@@ -21,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.springbootProject.jpaOperations.UsersRepository;
+
 import Kisan.connect.app.Exception.ResourceNotFoundException;
 import Kisan.connect.app.Repository.ProductsRepository;
 import Kisan.connect.app.Repository.ReviewRepository;
@@ -87,22 +89,19 @@ Path path=Paths.get(productImagePath,fileName);
 
 		return " product add sussfully";
 	}
-
-	public ResponseEntity<List<ProductsResponse>> getProducts() {
-		// TODO Auto-generated method stub
-		List<ProductsResponse> allProducts=new ArrayList<>();
-		List<Products> products=productsRepository.findAll();
-		
-		
 	
-		for(int i=0;i<products.size();i++) {
+	
+	
+	
+	public List<ProductsResponse> loadProducts(List<Products> products){
+		List<ProductsResponse> allProducts=new ArrayList<>();
+	for(int i=0;i<products.size();i++) {
 			
 			Products p=products.get(i);
 			Double rating=reviewRepository.getAverageRatingByProductId(p.getProductId());
 			Integer count =reviewRepository.getReviewCount(p.getProductId());
 			if(rating==null) {
-				rating=0.0;
-				
+				rating=0.0;	
 			}
 			ProductsResponse productResponse=new ProductsResponse(p.getProductId(),
 					                                 p.getProductName(),
@@ -122,11 +121,21 @@ Path path=Paths.get(productImagePath,fileName);
 			allProducts.add(i, productResponse);
 			
 		}
-		
-		
-		
-		return ResponseEntity.ok(allProducts);
+		return allProducts;	
 	}
+	
+
+	public ResponseEntity<List<ProductsResponse>> getProducts() {
+		// TODO Auto-generated method stub
+		List<Products> products=productsRepository.findAll();
+		
+	
+		return ResponseEntity.ok(loadProducts(products));
+	}
+	
+	
+	
+	
 
 	public ResponseEntity<ProductsResponse> getProductById(int id) {
 		// TODO Auto-generated method stub
@@ -200,37 +209,10 @@ Path path=Paths.get(productImagePath,fileName);
 		
 		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
 		List<Products> products=productsRepository.findByFarmer(userRepo.findByEmail(authentication.getName()) .orElseThrow(() -> new ResourceNotFoundException("Customer not found")));
-		List<ProductsResponse> allProducts=new ArrayList<>();
-		for(int i=0;i<products.size();i++) {
-			
-			Products p=products.get(i);
-			Double rating=reviewRepository.getAverageRatingByProductId(p.getProductId());
-			Integer count =reviewRepository.getReviewCount(p.getProductId());
-			if(rating==null) {
-				rating=0.0;
-			}
-			ProductsResponse productResponse=new ProductsResponse(p.getProductId(),
-					                                 p.getProductName(),
-					                                 p.getPrice(),
-					                                 p.getStock(),
-					                                 p.getUnit(),
-					                                 p.getCategory(),
-					                                 p.getDescription(),
-					                                 p.getImage(),
-					                                 p.getHarvestDate(),
-					                                 p.getExpiryDate(),
-					                                 p.getFarmer().getId(),
-					                                 p.getFarmer().getName(),
-					                                 p.getFarmer().getProfilePic()
-					                                 ,rating,p.getImage(),p.getTotalStock());
-			
-			productResponse.setReviewCount(count);
-			allProducts.add(i, productResponse);
-			
-		}
 		
 		
-		return allProducts;
+		
+		return loadProducts(products);
 	}
 
 	public ResponseEntity<String> updateProduct(int id, AddProductRequest request) throws IOException {
@@ -295,38 +277,21 @@ Path path=Paths.get(productImagePath,fileName);
 		
 		// TODO Auto-generated method stub
 		List<Products> products=reviewRepository.getHighRatingProducts(PageRequest.of(0, 4));
-		List<ProductsResponse> allProducts=new ArrayList<>();
-for(int i=0;i<products.size();i++) {
-			
-			Products p=products.get(i);
-			Double rating=reviewRepository.getAverageRatingByProductId(p.getProductId());
-			Integer count =reviewRepository.getReviewCount(p.getProductId());
-			if(rating==null) {
-				rating=0.0;
-			}
-			ProductsResponse productResponse=new ProductsResponse(p.getProductId(),
-					                                 p.getProductName(),
-					                                 p.getPrice(),
-					                                 p.getStock(),
-					                                 p.getUnit(),
-					                                 p.getCategory(),
-					                                 p.getDescription(),
-					                                 p.getImage(),
-					                                 p.getHarvestDate(),
-					                                 p.getExpiryDate(),
-					                                 p.getFarmer().getId(),
-					                                 p.getFarmer().getName(),
-					                                 p.getFarmer().getProfilePic()
-					                                 ,rating,p.getImage(),p.getTotalStock());
-			productResponse.setReviewCount(count);
-			
-			
-			allProducts.add(i, productResponse);
-			
-		}
-		
-		
-		return  ResponseEntity.ok(allProducts);
+
+				return  ResponseEntity.ok(loadProducts(products));
+	}
+
+	public ResponseEntity<List<ProductsResponse>> getProductByFarmer(int id) {
+		// TODO Auto-generated method stub
+	Users user= userRepo.findById(id)
+			.orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+		System.out.println("user"+user);
+	List<Products> products=productsRepository.findByFarmer(user);
+	System.out.println("products"+products);
+		System.out.println(" farmer id for products"+ id);
+		List<ProductsResponse> res=loadProducts(products);
+		System.out.println(res);
+	return  ResponseEntity.ok(res);
 	}
 	
 	
