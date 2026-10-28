@@ -3,6 +3,7 @@ package Kisan.connect.app.Response;
 
 import java.time.LocalDateTime;
 
+import Kisan.connect.app.entities.Products;
 import Kisan.connect.app.entities.Users;
 
 public class ReviewResponse {
@@ -13,6 +14,13 @@ public class ReviewResponse {
 	private Integer rating;
 	private String comment;
 	private Users customerDetails;
+	private Products product;
+	public Products getProduct() {
+		return product;
+	}
+	public void setProduct(Products product) {
+		this.product = product;
+	}
 	public Users getCustomerDetails() {
 		return customerDetails;
 	}

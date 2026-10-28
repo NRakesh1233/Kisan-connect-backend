@@ -135,7 +135,7 @@ public class UserService {
 				.map(users -> {
 					UserDetails userDetails = new CustomUserDetails(users);
 					String accessToken = jwtUtills.generateToken(userDetails);
-					
+					System.out.println("new access token"+accessToken);
 					return new AuthenticationResponse(
 							accessToken,
 							requestRefreshToken,

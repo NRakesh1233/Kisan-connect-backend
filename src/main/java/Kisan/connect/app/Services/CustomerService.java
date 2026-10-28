@@ -613,9 +613,30 @@ OrderResponse orderResponse=new OrderResponse(
 			res.setComment(rew.getReview());
 			res.setRating(rew.getRating());
 			res.setDate(rew.getReviewDate());
+			res.setProduct(rew.getProduct());
 	return res;
 		// TODO Auto-generated method stub
 		
+	}
+
+	public ResponseEntity<List<ReviewResponse>> getReviewByCustomer() {
+		
+		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	        Users customer = userRepo.findByEmail(authentication.getName())
+	                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+	        
+	       List<Review> reviews=reviewRepository.findByCustomer(customer);
+	       List<ReviewResponse> response= new ArrayList<>();
+	       
+	       for(int i=0;i<reviews.size();i++) {
+	    	   
+	    	   response.add(convertToResponse(reviews.get(i)));
+	       }
+	       
+	        
+		// TODO Auto-generated method stub
+		return  ResponseEntity.ok(response);
 	}
 
 

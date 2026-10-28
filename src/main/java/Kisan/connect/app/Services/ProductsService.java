@@ -234,6 +234,7 @@ Path path=Paths.get(productImagePath,fileName);
 		product.setUnit(request.getUnit());
 		product.setCategory(request.getCategory().toLowerCase());
 		product.setDescription(request.getDescription());
+		product.setTotalStock(request.getTotalStock());
 		
 		if (request.getImage() != null &&
 			    !request.getImage().isEmpty()) {

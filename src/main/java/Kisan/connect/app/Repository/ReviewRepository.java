@@ -47,4 +47,10 @@ public interface ReviewRepository extends JpaRepository<Review,Integer> {
 
 
 	Optional<Review> findByCustomerAndOrderItem(Users customer, OrderItems item);
+	
+	
+
+
+	List<Review> findByCustomer(Users user);
+	
 }

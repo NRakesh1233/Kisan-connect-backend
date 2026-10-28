@@ -199,5 +199,13 @@ String response= customerService.addOrder(request);
 		return customerService.getReviewByCustomerAndItem(id);
 		
 	}
+	@GetMapping("/reviews/all")
+	public ResponseEntity<List<ReviewResponse>> fetchReviewsByCustomer(){
+		
+		
+		
+		return customerService.getReviewByCustomer();
+		
+	}
 	
 }

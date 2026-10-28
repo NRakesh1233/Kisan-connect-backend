@@ -14,7 +14,20 @@ public class AddProductRequest {
 
     private String productName;
 
-    private Double price;
+    public Double getTotalStock() {
+		return totalStock;
+	}
+
+
+
+
+	public void setTotalStock(Double totalStock) {
+		this.totalStock = totalStock;
+	}
+
+
+
+	private Double price;
 
     private Double stock;
     
